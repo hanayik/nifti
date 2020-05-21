@@ -60,8 +60,8 @@ type Nifti1Header struct {
 	//							total header size = 348B
 }
 
-func ReadBytes(file os.File, number int32) []byte {
-	bytes := make([]byte, number)
+func readBtyes(file os.File, n int32) []byte {
+	bytes := make([]byte, n)
 	_, err := file.Read(bytes)
 	if err != nil {
 		log.Fatal(err)
@@ -69,12 +69,18 @@ func ReadBytes(file os.File, number int32) []byte {
 	return bytes
 }
 
-func ReadNiftiType(file os.File) int {
+func ReadNiftiType(path string) int {
+	// returns int 1, 2, or 0
+	// 1=Nifti1
+	// 2=Nifti2
+	// 0=unknown
+	file := openFile(path)
+	defer file.Close()
 	// just read the first 4 bytes to get nifti type
 	var nbytes int32 = 4
 	var nType int32
-	rawbytes := ReadBytes(file, nbytes)
-	buffer := bytes.NewBuffer(rawbytes)
+	rawbytes := readBtyes(file, nbytes)
+	buffer := bytes.NewReader(rawbytes)
 	err := binary.Read(buffer, binary.LittleEndian, &nType)
 	if err != nil {
 		log.Fatal("ReadNiftiType failed", err)
@@ -88,10 +94,14 @@ func ReadNiftiType(file os.File) int {
 	}
 }
 
-func ReadNifti1Header(file os.File) Nifti1Header {
+func ReadNifti1Header(path string) Nifti1Header {
+	// read the entire Nifti1 header into a struct
+	// return only the header content as a struct
+	file := openFile(path)
+	defer file.Close()
 	header := Nifti1Header{}
-	rawbytes := ReadBytes(file, Nifti1HeaderBytes) 
-	buffer := bytes.NewBuffer(rawbytes)
+	rawbytes := readBtyes(file, Nifti1HeaderBytes) 
+	buffer := bytes.NewReader(rawbytes)
 	err := binary.Read(buffer, binary.LittleEndian, &header)
 	if err != nil {
 		log.Fatal("ReadNifti1Header failed", err)
@@ -111,23 +121,25 @@ func PrintNifti1Header(h Nifti1Header) {
 	}
 }
 
-func OpenFile(path string) *os.File {
+func openFile(path string) os.File {
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal("Error while opening file", err)
 	}
 
-	return file
+	return *file
 }
 
 func main() {
     path := "sub-01 anat sub-01_T1w.nii"
+	//path := "MNI152_T1_1mm_nifti2.nii"
+	// file := OpenFile(path)
+	// defer file.Close()
+	// header := ReadNifti1Header(*file)
+	// PrintNifti1Header(header)
 
-	file := OpenFile(path)
-	defer file.Close()
-
-	if ReadNiftiType(*file) == 1 {
-		header := ReadNifti1Header(*file)
+	if ReadNiftiType(path) == 1 {
+		header := ReadNifti1Header(path)
 		PrintNifti1Header(header)
 	} else {
 		fmt.Println("Not a Nifti1 file")
