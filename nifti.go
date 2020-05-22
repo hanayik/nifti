@@ -1,4 +1,4 @@
-package main
+package nifti
 
 import (
 	"fmt"
@@ -130,18 +130,18 @@ func openFile(path string) os.File {
 	return *file
 }
 
-func main() {
-    path := "sub-01 anat sub-01_T1w.nii"
-	//path := "MNI152_T1_1mm_nifti2.nii"
-	// file := OpenFile(path)
-	// defer file.Close()
-	// header := ReadNifti1Header(*file)
-	// PrintNifti1Header(header)
+// func main() {
+//     path := "sub-01 anat sub-01_T1w.nii"
+// 	//path := "MNI152_T1_1mm_nifti2.nii"
+// 	// file := OpenFile(path)
+// 	// defer file.Close()
+// 	// header := ReadNifti1Header(*file)
+// 	// PrintNifti1Header(header)
 
-	if ReadNiftiType(path) == 1 {
-		header := ReadNifti1Header(path)
-		PrintNifti1Header(header)
-	} else {
-		fmt.Println("Not a Nifti1 file")
-	}
-}
+// 	if ReadNiftiType(path) == 1 {
+// 		header := ReadNifti1Header(path)
+// 		PrintNifti1Header(header)
+// 	} else {
+// 		fmt.Println("Not a Nifti1 file")
+// 	}
+// }
