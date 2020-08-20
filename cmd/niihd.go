@@ -1,12 +1,12 @@
 package main
 
 import (
-	"nifti"
 	"fmt"
+	"nifti"
 )
 
 func main() {
-    path := "../test_data/sub-01 anat sub-01_T1w.nii"
+	path := "../test_data/sub-01 anat sub-01_T1w.nii"
 	//path := "MNI152_T1_1mm_nifti2.nii"
 
 	if nifti.ReadNiftiType(path) == 1 {

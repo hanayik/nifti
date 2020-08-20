@@ -1,11 +1,11 @@
 package nifti
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"log"
 	"os"
-	"bytes"
-	"encoding/binary"
 	"reflect"
 )
 
@@ -14,49 +14,49 @@ const Nifti2HeaderBytes int32 = 540
 
 type Nifti1Header struct {
 	//            						offset	size
-	SizeOfHdr 		int32			//	0B		4B
-	DateType		[10]byte		//	4B		10B
-	DBName			[18]byte		//	14B		18B
-	Extents			int32			//	32B		4B
-	SessionError	int16			//	36B		2B
-	Regular			byte			//	38B		1B
-	DimInfo			byte			//	39B		1B
-	Dim				[8]int16		//	40B		16B
-	IntentP1		float32			//	56B		4B
-	IntentP2		float32			//	60B		4B
-	IntentP3		float32			//	64B		4B
-	IntentCode		int16			//	68B		2B
-	DataType		int16			//	70B		2B
-	BitPix			int16			//	72B		2B
-	SliceStart		int16			//	74B		2B
-	PixDim			[8]float32		//	76B		32B
-	VoxOffset		float32			//	108B	4B
-	SclSlope		float32			//	112B	4B
-	SclInter		float32			//	116B	4B
-	SliceEnd		int16			//	120B	2B
-	SliceCode		byte			//	122B	1B
-	XYZTUnits		byte			//	123B	1B
-	CalMax			float32			//	124B	4B
-	CalMin			float32			//	128B	4B
-	SliceDuration	float32			//	132B	4B
-	TOffset			float32			//	136B	4B
-	GlMax			int32			//	140B	4B
-	GlMin			int32			//	144B	4B
-	Descrip			[80]byte		//	148B	80B
-	AuxFile			[24]byte		//	228B	24B
-	QFormCode		int16			//	252B	2B
-	SFormCode		int16			//	254B	2B
-	QuaternB		float32			//	256B	4B
-	QuaternC		float32			//	260B	4B
-	QuaternD		float32			//	264B	4B
-	QOffsetX		float32			//	268B	4B
-	QOffsetY		float32			//	272B	4B
-	QOffsetZ		float32			//	276B	4B
-	SRowX			[4]float32		//	280B	16B
-	SRowY			[4]float32		//	296B	16B
-	SRowZ			[4]float32		//	312B	16B
-	IntentName		[16]byte		//	328B	16B
-	Magic			[4]byte			//	344		4B
+	SizeOfHdr     int32      //	0B		4B
+	DateType      [10]byte   //	4B		10B
+	DBName        [18]byte   //	14B		18B
+	Extents       int32      //	32B		4B
+	SessionError  int16      //	36B		2B
+	Regular       byte       //	38B		1B
+	DimInfo       byte       //	39B		1B
+	Dim           [8]int16   //	40B		16B
+	IntentP1      float32    //	56B		4B
+	IntentP2      float32    //	60B		4B
+	IntentP3      float32    //	64B		4B
+	IntentCode    int16      //	68B		2B
+	DataType      int16      //	70B		2B
+	BitPix        int16      //	72B		2B
+	SliceStart    int16      //	74B		2B
+	PixDim        [8]float32 //	76B		32B
+	VoxOffset     float32    //	108B	4B
+	SclSlope      float32    //	112B	4B
+	SclInter      float32    //	116B	4B
+	SliceEnd      int16      //	120B	2B
+	SliceCode     byte       //	122B	1B
+	XYZTUnits     byte       //	123B	1B
+	CalMax        float32    //	124B	4B
+	CalMin        float32    //	128B	4B
+	SliceDuration float32    //	132B	4B
+	TOffset       float32    //	136B	4B
+	GlMax         int32      //	140B	4B
+	GlMin         int32      //	144B	4B
+	Descrip       [80]byte   //	148B	80B
+	AuxFile       [24]byte   //	228B	24B
+	QFormCode     int16      //	252B	2B
+	SFormCode     int16      //	254B	2B
+	QuaternB      float32    //	256B	4B
+	QuaternC      float32    //	260B	4B
+	QuaternD      float32    //	264B	4B
+	QOffsetX      float32    //	268B	4B
+	QOffsetY      float32    //	272B	4B
+	QOffsetZ      float32    //	276B	4B
+	SRowX         [4]float32 //	280B	16B
+	SRowY         [4]float32 //	296B	16B
+	SRowZ         [4]float32 //	312B	16B
+	IntentName    [16]byte   //	328B	16B
+	Magic         [4]byte    //	344		4B
 	//							total header size = 348B
 }
 
@@ -100,7 +100,7 @@ func ReadNifti1Header(path string) Nifti1Header {
 	file := openFile(path)
 	defer file.Close()
 	header := Nifti1Header{}
-	rawbytes := readBtyes(file, Nifti1HeaderBytes) 
+	rawbytes := readBtyes(file, Nifti1HeaderBytes)
 	buffer := bytes.NewReader(rawbytes)
 	err := binary.Read(buffer, binary.LittleEndian, &header)
 	if err != nil {
@@ -129,19 +129,3 @@ func openFile(path string) os.File {
 
 	return *file
 }
-
-// func main() {
-//     path := "sub-01 anat sub-01_T1w.nii"
-// 	//path := "MNI152_T1_1mm_nifti2.nii"
-// 	// file := OpenFile(path)
-// 	// defer file.Close()
-// 	// header := ReadNifti1Header(*file)
-// 	// PrintNifti1Header(header)
-
-// 	if ReadNiftiType(path) == 1 {
-// 		header := ReadNifti1Header(path)
-// 		PrintNifti1Header(header)
-// 	} else {
-// 		fmt.Println("Not a Nifti1 file")
-// 	}
-// }
